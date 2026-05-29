@@ -1,6 +1,40 @@
+// Language Switcher Engine
+function applyLanguage(lang) {
+    document.querySelectorAll('[data-id], [data-en]').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) {
+            // Check if text has HTML or icons and replace innerHTML safely
+            if (text.includes('<') || text.includes('>') || text.includes('&') || text.includes('class=')) {
+                el.innerHTML = text;
+            } else {
+                el.textContent = text;
+            }
+        }
+    });
+    
+    // Update active class on language toggle buttons
+    const langToggleSpans = document.querySelectorAll('.lang-toggle .lang-btn');
+    langToggleSpans.forEach(s => {
+        const sLang = s.getAttribute('data-lang') || s.textContent.trim().toLowerCase();
+        if (sLang === lang) {
+            s.classList.add('active');
+        } else {
+            s.classList.remove('active');
+        }
+    });
+}
+
 // Load Layout dynamically (header & footer) with local storage cache to prevent layout shifts/flickering
 async function loadLayout() {
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+
+    // Invalidate old cache to ensure bilingual translations load for returning users
+    const CACHE_VERSION = 'v2';
+    if (localStorage.getItem('layout-version') !== CACHE_VERSION) {
+        localStorage.removeItem('header-html');
+        localStorage.removeItem('footer-html');
+        localStorage.setItem('layout-version', CACHE_VERSION);
+    }
 
     try {
         const [headerRes, footerRes] = await Promise.all([
@@ -18,6 +52,10 @@ async function loadLayout() {
         // Save to cache for instant load next time
         localStorage.setItem('header-html', headerHtml);
         localStorage.setItem('footer-html', footerHtml);
+        
+        // Apply current language immediately to dynamic elements
+        const currentLang = localStorage.getItem('lang') || 'id';
+        applyLanguage(currentLang);
     } catch (err) {
         console.error('Error loading layout:', err);
     }
@@ -44,8 +82,14 @@ function initializeLayoutEvents() {
     langToggleSpans.forEach(span => {
         span.addEventListener('click', (e) => {
             if(e.target.textContent.trim() === '/') return;
-            langToggleSpans.forEach(s => s.classList.remove('active'));
-            e.target.classList.add('active');
+            const selectedLang = e.target.getAttribute('data-lang') || e.target.textContent.trim().toLowerCase();
+            const currentLang = localStorage.getItem('lang') || 'id';
+            
+            // Only reload if a new language is selected to prevent unnecessary page refreshes
+            if (selectedLang !== currentLang) {
+                localStorage.setItem('lang', selectedLang);
+                window.location.reload();
+            }
         });
     });
 
@@ -100,6 +144,10 @@ function initializeLayoutEvents() {
 
 // Initial script execution on load
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply language to static elements instantly
+    const currentLang = localStorage.getItem('lang') || 'id';
+    applyLanguage(currentLang);
+
     // Load layouts
     loadLayout();
 

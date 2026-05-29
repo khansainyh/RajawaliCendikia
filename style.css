@@ -614,9 +614,14 @@ p {
 }
 
 .target-card h3 {
-    font-size: 1.2rem;
+    font-size: 1.1rem; /* Adjusted for longer full-length titles to wrap elegantly */
     color: var(--text-main);
     margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.target-card h3:last-child {
+    margin-bottom: 0;
 }
 
 .target-card p {
@@ -781,6 +786,18 @@ p {
     
     .title-underline-left {
         margin: 0 auto 2rem;
+    }
+    
+    .detail-left {
+        text-align: justify;
+    }
+    
+    .detail-left h2 {
+        text-align: left;
+    }
+    
+    .detail-left .title-underline-left {
+        margin: 0 0 2rem;
     }
     
     .acc-inner {
