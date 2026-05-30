@@ -26,10 +26,14 @@ function applyLanguage(lang) {
 
 // Load Layout dynamically (header & footer) with local storage cache to prevent layout shifts/flickering
 async function loadLayout() {
-    const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    const getPage = (p) => {
+        const seg = p.split('?')[0].split('#')[0].replace(/\/+$/, '').split('/').pop();
+        return (!seg || seg === 'index.html' || seg === 'home') ? 'home' : seg.replace(/\.html$/, '');
+    };
+    const currentPage = getPage(window.location.pathname);
 
     // Invalidate old cache to ensure bilingual translations load for returning users
-    const CACHE_VERSION = 'v2';
+    const CACHE_VERSION = 'v3';
     if (localStorage.getItem('layout-version') !== CACHE_VERSION) {
         localStorage.removeItem('header-html');
         localStorage.removeItem('footer-html');
@@ -63,9 +67,8 @@ async function loadLayout() {
     // Set active link class
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach(link => {
-        // Strip relative paths if present
-        const href = link.getAttribute('href').split('/').pop();
-        if (href === currentPath) {
+        const href = link.getAttribute('href');
+        if (href && getPage(href) === currentPage) {
             link.classList.add('active');
         } else {
             link.classList.remove('active');

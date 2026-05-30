@@ -6,6 +6,28 @@ export default defineConfig({
     port: 5188,
     strictPort: true,
   },
+  plugins: [
+    {
+      name: 'html-rewrite',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = new URL(req.url, `http://${req.headers.host}`);
+          const pathname = url.pathname;
+          
+          if (pathname === '/home') {
+            req.url = '/index.html';
+          } else if (pathname === '/strategy') {
+            req.url = '/strategy.html';
+          } else if (pathname === '/services') {
+            req.url = '/services.html';
+          } else if (pathname === '/methodology') {
+            req.url = '/methodology.html';
+          }
+          next();
+        });
+      }
+    }
+  ],
   build: {
     rollupOptions: {
       input: {

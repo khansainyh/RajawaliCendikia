@@ -1,0 +1,22 @@
+RewriteEngine On
+RewriteBase /
+
+# Redirect /index.html to /home (canonical URL)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.html\ HTTP/
+RewriteRule ^index\.html$ home [R=301,L]
+
+# Redirect /<page>.html to /<page> (canonical URL)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /([a-zA-Z0-9_-]+)\.html\ HTTP/
+RewriteRule ^([a-zA-Z0-9_-]+)\.html$ %1 [R=301,L]
+
+# Route /home to index.html internally
+RewriteRule ^home$ index.html [L]
+
+# Route /strategy to strategy.html internally
+RewriteRule ^strategy$ strategy.html [L]
+
+# Route /services to services.html internally
+RewriteRule ^services$ services.html [L]
+
+# Route /methodology to methodology.html internally
+RewriteRule ^methodology$ methodology.html [L]
