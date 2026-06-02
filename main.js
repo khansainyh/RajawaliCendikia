@@ -33,7 +33,7 @@ async function loadLayout() {
     const currentPage = getPage(window.location.pathname);
 
     // Invalidate old cache to ensure bilingual translations load for returning users
-    const CACHE_VERSION = 'v3';
+    const CACHE_VERSION = 'v4';
     if (localStorage.getItem('layout-version') !== CACHE_VERSION) {
         localStorage.removeItem('header-html');
         localStorage.removeItem('footer-html');
@@ -42,8 +42,8 @@ async function loadLayout() {
 
     try {
         const [headerRes, footerRes] = await Promise.all([
-            fetch('/header.html'),
-            fetch('/footer.html')
+            fetch('/header.html?v=4', { cache: 'no-store' }),
+            fetch('/footer.html?v=4', { cache: 'no-store' })
         ]);
         
         const headerHtml = await headerRes.text();
